@@ -1,0 +1,38 @@
+.TH GETSENDERIP 1
+.SH NAME
+getsenderip \- write sender IP to a file.
+.SH SYNOPSIS
+.B | getsenderip
+.I out
+.SH DESCRIPTION
+.I getsenderip
+is used in .qmail files to write the IP address from the
+.B Received: from
+lines into 
+.I out
+file.
+.br
+This file could be used to build a private
+.B RBL list
+for
+.BR rbldns(8).
+.SH EXIT CODES
+The program exit code are: 
+ 0    normal processing
+ 111  when the program fails or no out file was given
+.SH EXAMPLE
+We store all IPs into
+.I data.trap
+and the mail is discarded
+.P
+    | getsenderip data.trap
+.SH AUTHOR
+Luca Morettoni <luca@morettoni.net> - http://morettoni.net
+.SH SEE ALSO
+dot-qmail(5),
+qmail-command(8),
+rbldns(8)
+
+http://morettoni.net/qmail-rblchk.en.html
+.SH BUGS
+Report me any bug, problem or other hints!

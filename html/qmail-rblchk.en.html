@@ -1,0 +1,221 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+ <head>
+  <title>qmail-rblchk</title>
+  <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+  <meta name="description" content="Luca Morettoni, software and internet consulting">
+  <meta name="keywords" content="internet,software,sviluppo,unix,freebsd,bsd,linux,qmail,djbdns,tinydns,c,php,opensource,italia">
+  <meta name="author" content="Luca Morettoni">
+  <meta name="robots" content="all">
+  <meta name="rating" content="general">
+ </head>
+ <body>
+  <!-- $Id: qmail-rblchk.en.html,v 1.6 2006/01/24 08:17:24 luca Exp $ -->
+  <a href="index.html">Luca Morettoni</a>
+  <br>
+  <a href="qmail-rblchk.html">Versione Italiana</a>
+  <h1>qmail-rblchk</h1>
+  <tt>qmail-rblchk</tt> filter all incoming mail and check if it comes from RBL listed IPs.
+  <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+  <input type="hidden" name="cmd" value="_s-xclick">
+Support this project:
+<input type="image" src="https://www.paypal.com/it_IT/i/btn/x-click-but04.gif" border="0" name="submit" alt="Effettua i tuoi pagamenti con PayPal.  un sistema rapido, gratuito e sicuro.">
+<input type="hidden" name="encrypted" value="-----BEGIN PKCS7-----MIIHNwYJKoZIhvcNAQcEoIIHKDCCByQCAQExggEwMIIBLAIBADCBlDCBjjELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRYwFAYDVQQHEw1Nb3VudGFpbiBWaWV3MRQwEgYDVQQKEwtQYXlQYWwgSW5jLjETMBEGA1UECxQKbGl2ZV9jZXJ0czERMA8GA1UEAxQIbGl2ZV9hcGkxHDAaBgkqhkiG9w0BCQEWDXJlQHBheXBhbC5jb20CAQAwDQYJKoZIhvcNAQEBBQAEgYCzOVVsG99UVy1KDuNFypFILaJFgiZOaqAx+VYWcJ58QZhBDfS1bmXtoqYaDs8ggGjAV2aqH9tefkO2HgdQ+ZYii45JrZ+CoOqf8P9wT02Y/431iImjG/RpC6CjK0URIwy4ijqcTWosjWsSzLK9lS44s07+lKfKbrzpVQryRpGtCjELMAkGBSsOAwIaBQAwgbQGCSqGSIb3DQEHATAUBggqhkiG9w0DBwQIcZORd8Dx5rWAgZD+bGPbXZrjwgkoHI8Ih9b1DBJ/vUiFpA0rq327qz/0KZoxpXKOLiQxhBIG8G00STAJPO1pOANVSxh8a8SmpHshz/WS9WMwgNOy0aR79rHXGZQJFe1h+QU7KICrrBZI6k9w4wJKo/W+hKg9+FqimGLr0bayqgFjHstgIwbn6I8tTRkni2crddpUXEW2RUkLWrOgggOHMIIDgzCCAuygAwIBAgIBADANBgkqhkiG9w0BAQUFADCBjjELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRYwFAYDVQQHEw1Nb3VudGFpbiBWaWV3MRQwEgYDVQQKEwtQYXlQYWwgSW5jLjETMBEGA1UECxQKbGl2ZV9jZXJ0czERMA8GA1UEAxQIbGl2ZV9hcGkxHDAaBgkqhkiG9w0BCQEWDXJlQHBheXBhbC5jb20wHhcNMDQwMjEzMTAxMzE1WhcNMzUwMjEzMTAxMzE1WjCBjjELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRYwFAYDVQQHEw1Nb3VudGFpbiBWaWV3MRQwEgYDVQQKEwtQYXlQYWwgSW5jLjETMBEGA1UECxQKbGl2ZV9jZXJ0czERMA8GA1UEAxQIbGl2ZV9hcGkxHDAaBgkqhkiG9w0BCQEWDXJlQHBheXBhbC5jb20wgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAMFHTt38RMxLXJyO2SmS+Ndl72T7oKJ4u4uw+6awntALWh03PewmIJuzbALScsTS4sZoS1fKciBGoh11gIfHzylvkdNe/hJl66/RGqrj5rFb08sAABNTzDTiqqNpJeBsYs/c2aiGozptX2RlnBktH+SUNpAajW724Nv2Wvhif6sFAgMBAAGjge4wgeswHQYDVR0OBBYEFJaffLvGbxe9WT9S1wob7BDWZJRrMIG7BgNVHSMEgbMwgbCAFJaffLvGbxe9WT9S1wob7BDWZJRroYGUpIGRMIGOMQswCQYDVQQGEwJVUzELMAkGA1UECBMCQ0ExFjAUBgNVBAcTDU1vdW50YWluIFZpZXcxFDASBgNVBAoTC1BheVBhbCBJbmMuMRMwEQYDVQQLFApsaXZlX2NlcnRzMREwDwYDVQQDFAhsaXZlX2FwaTEcMBoGCSqGSIb3DQEJARYNcmVAcGF5cGFsLmNvbYIBADAMBgNVHRMEBTADAQH/MA0GCSqGSIb3DQEBBQUAA4GBAIFfOlaagFrl71+jq6OKidbWFSE+Q4FqROvdgIONth+8kSK//Y/4ihuE4Ymvzn5ceE3S/iBSQQMjyvb+s2TWbQYDwcp129OPIbD9epdr4tJOUNiSojw7BHwYRiPh58S1xGlFgHFXwrEBb3dgNbMUa+u4qectsMAXpVHnD9wIyfmHMYIBmjCCAZYCAQEwgZQwgY4xCzAJBgNVBAYTAlVTMQswCQYDVQQIEwJDQTEWMBQGA1UEBxMNTW91bnRhaW4gVmlldzEUMBIGA1UEChMLUGF5UGFsIEluYy4xEzARBgNVBAsUCmxpdmVfY2VydHMxETAPBgNVBAMUCGxpdmVfYXBpMRwwGgYJKoZIhvcNAQkBFg1yZUBwYXlwYWwuY29tAgEAMAkGBSsOAwIaBQCgXTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEPFw0wNjAxMTIxMzEzMTBaMCMGCSqGSIb3DQEJBDEWBBQc+IqI2TERk8vDqtSgEUNkKLgUvTANBgkqhkiG9w0BAQEFAASBgL3FsRCUbszVbXXGvvNJ8YwhqNFzBrDMplxdFL+FmxfnAVKVBQW3aspYP2x7q4CMJwlvqVS2uYw3+OvKIyqMYOeVUwewxdGsFSmOfI8wVvUFghczZ112qAwEzTUJ3hoHICR3nH83PXd+hOADTnwi3RKADmAvP32Y6KtXTDcTXS8+-----END PKCS7-----
+">
+</form>
+  <h2>Installation</h2>
+  Download the package at
+  <a href="/qmail/qmail-rblchk-2.4.1.tar.gz">qmail-rblchk-2.4.1.tar.gz</a> (Perugia, Italy)
+  <!-- - <a href="http://cvs.delink.net/mirrors/morettoni.net/qmail-rblchk-2.4.1.tar.gz">qmail-rblchk-2.4.1.tar.gz</a> (Cleveland, Ohio, USA) -->
+  <p>
+  Compile it with:
+<pre>
+     tar -xfz qmail-rblchk-<i>[version]</i>.tar.gz
+     cd qmail-rblchk
+     make setup check
+</pre>
+  Edit <tt>conf-*</tt> files to set compile and install options.
+  <p>
+  If you use <a href="http://www.FreeBSD.org">FreeBSD</a> you can install <tt>qmail-rblchk</tt>
+  with his port:
+<pre>
+    cd /usr/ports/mail/qmail-rblchk
+    make install clean
+</pre>
+  <h2>Use</h2>
+  <pre>    |qmail-rblchk <i>[options] [/dir/]</i></pre>
+  <tt>qmail-rblchk</tt> is for use in <tt>.qmail</tt> to check the IP address from the <tt>Received: from</tt> lines.
+  It has the same function as <a href="http://cr.yp.to/ucspi-tcp/rblsmtpd.html">rblsmtpd</a>,
+  but the messages are checked at local delivery time, with this you can check the content
+  of the message simply redirecting it to another mailbox or address.
+  <p>
+  If a directory is given with <tt><i>dir</i></tt> all spam message are delivered to that directory
+  if it exist and is in Maildir format.<br>
+  Directory name must start with a <tt>/</tt> or <tt>.</tt> (dot) and end with a <tt>/</tt>.
+  <h2>General options</h2>
+  <ul>
+   <li><tt>-h</tt>: show a sort program description;
+   <li><tt>-s</tt>: add &quot;X-Spam&quot; header into the incoming mail (work only with delivery in <tt>dir/</tt>);
+   <li><tt>-i NUM</tt>: ignore first <tt>NUM</tt> IPs found in the header;
+   <li><tt>-x IP</tt>: do not check <tt>IP</tt>, try to find other address in header (you can ignore max 16 IPs);
+   <li><tt>-m</tt>: check all IPs that find in mail header (default check only the first);
+   <li><tt>-v</tt>: debug mode, make output more verbose;
+   <li><tt>-p</tt>: don't check private IP classes:
+   <ul>
+     <li>127.0.0.0 - 127.255.255.255
+     <li>10.0.0.0 - 10.255.255.255
+     <li>172.16.0.0 - 172.31.255.255
+     <li>192.168.0.0 - 192.168.255.255
+   </ul>
+   <li><tt>-q</tt>: quiet mode;
+   <li><tt>-l LOG</tt>: redirect to file <tt>LOG</tt> program messages;
+   <li><tt>-L DATA</tt>: write blocked IP address tu file <tt>DATA</tt> (you can use the
+   <tt>DATA</tt> file to build your RBL list, see example below);
+   <li><tt>-c</tt>: turn on the <tt>condredirect</tt> compatibility mode for exit code.
+  </ul>
+  <h2>Control options</h2>
+  <ul>
+   <li><tt>-r <i>addr</i></tt>: request if a <tt>TXT</tt> record exist into <tt><i>addr</i></tt>;
+   <li><tt>-R <i>addr</i></tt>: request if a <tt>TXT</tt> record not exist into <tt><i>addr</i></tt>;
+   <li><tt>-a <i>addr</i></tt>: request if a <tt>A</tt> record not exist into <tt><i>addr</i></tt>;
+   <li><tt>-A <i>addr</i></tt>: request if a <tt>A</tt> record exist into <tt><i>addr</i></tt>;
+   <li><tt>-C <i>addr</i></tt>: request if a <tt>A</tt> or <tt>TXT</tt> record exist into <tt><i>addr</i></tt>,
+   if true the mail is not SPAM and the program exit;
+   <li><tt>-X <i>cdb</i></tt>: check if the sender IP is listed in <i>cdb</i> file, see
+   <a href="http://cr.yp.to/ucspi-tcp/tcprules.html">tcprules</a> or EXAMPLES
+   section for the format
+  </ul>
+  It's possible to use up to 32 control options to specify more RBL server; those are checked until
+  the first of them answere true and the mail will be tagged as a &quot;spam&quot; (unless you use <tt>-C</tt>
+  option).
+  <p>
+  If a mail come from <tt>a.b.c.d</tt> IP, the request that the program send to DNS server is:
+  <tt>d.c.b.a.<i>addr</i></tt> where <tt><i>addr</i></tt> is the parameter that come after <tt>-r</tt>, 
+  <tt>-R</tt>, <tt>-a</tt> or <tt>-A</tt> options.
+  <h2>Exit code</h2>
+  The exit code of program depends on use of <tt>-c</tt> option or delivery <tt>dir</tt>:
+   <p>
+   <table border="1">
+	   <tr><td>Message</td><td>Standard</td><td>with <tt>-c</tt></td><td>with <tt>dir</tt></td></tr>
+           <tr><td>Normal</td><td align="center">0</td><td align="center">1</td><td align="center">0</td></tr>
+	   <tr><td>Spam</td><td align="center">100</td><td align="center">0</td><td align="center">99</td></tr>
+	   <tr><td>Problem</td><td align="center">111</td><td align="center">111</td><td align="center">111</td></tr>
+   </table>
+  <h2>Examples</h2>
+  This are some example of qmail-rblchk use, please read carefully <tt>dot-qmail(5)</tt>,
+  <tt>qmail-command(8)</tt> and <tt>condredirect(1)</tt>
+  man pages to prevent lost of mail.
+  <p>
+  We check <tt>bl.spamcop.net</tt> and <tt>dialups.mail-abuse.org</tt> RBL list.
+  If the mail is spam the delivery fail and the sender will receive a bounce message.
+<pre>
+    # we discard all suspected mail
+    | qmail-rblchk -r bl.spamcop.net -r dialups.mail-abuse.org
+</pre>
+  We delivery all mail that comeis from RBL listed IPs to our <tt>spam</tt> Maildir.
+<pre>
+    # save spam-suspected mail in another Maildir
+    | qmail-rblchk -r bl.spamcop.net -r dialups.mail-abuse.org ../spam/
+</pre>
+  Same as above, but all spam message are delivered to <tt>me-spam</tt> address with <tt>condredirect</tt>
+<pre>
+    # save spam-suspected mail in another box
+    | condredirect me-spam qmail-rblchk -c -r bl.spamcop.net -r dialups.mail-abuse.org
+</pre>
+  Into <tt>contrib</tt> directory you can find a script (<tt>spam-report.sh</tt>) that
+  send to you some stats about <tt>qmail-rblchk</tt> filtering actions.<br>
+  You must run <tt>qmail-rblchk</tt> with <tt>-l</tt> option (to have the logs),
+  after check the paths into the script and run it into <tt>crontab</tt> like this:
+<pre>
+    0    0    *    *    * spam-report.sh email_addr NUM
+</pre>
+  at 00:00 you receive at <i>email_addr</i> a mail like this (the script preserve
+  and gzip <tt>NUM</tt> old log files):
+<pre>
+    Date: 23 Jan 2006 00:00:03 -0000
+    From: luca@home.morettoni.local
+    To: luca@home.morettoni.local
+    Subject: qmail-rblchk report
+
+    qmail-rblchk report
+    ===================
+
+    Messages:
+     total: 137
+     good:  76      (55.500%)
+     spam:  61      (44.500%)
+
+    Check:
+     DNS query: 306
+     over cdb:  122
+
+    RBL list usage:
+     list #1 hits: 11
+     list #2 hits: 32
+     list #3 hits: 16
+
+    cdb usage:
+     allowed IPs:   5
+     blocked IPs:   7
+
+    --
+    qmail-rblchk 2.4.1 - Luca Morettoni &lt;luca@morettoni.net&gt;
+    See more at http://morettoni.net
+</pre>
+  If you want to use a <i>cdb</i> file with the <tt>-X</tt> option, create a
+  <i>rule</i> file like that:
+<pre>
+    # allow mails from local network
+    192.168.0.:allow
+    # some spammer IPs
+    10.0.0.1:deny
+    1.2.3.4:deny
+</pre>
+  create the <i>CDB</i> file with:
+<pre>
+    tcprules rule.cdb rule.tmp < rule
+</pre>
+  and use in your <tt>.qmail</tt> file with:
+<pre>
+    | qmail-rblchk -X ./rule.cdb -r sbl-xbl.spamhaus.org ../spam/
+</pre>
+  if the IP is found in <tt>rule.cdb</tt> <tt>qmail-rblchk</tt> follow the rule in the
+  file:
+  <ul>
+   <li><b>allow</b> the message is good;
+   <li><b>deny</b> the message is spam
+  </ul>
+  if the IP is not listed <tt>qmail-rblchk</tt> continue with normal RBL checking.
+  You  can  insert into the <i>CDB</i> file a default rule (<b>:allow</b> or <b>:deny</b>), to
+  block or accept all other IPs.
+  <h2>Build your list</h2>
+  If you use the <tt>-L</tt> option you can build your private RBL list, remember
+  that <tt>qmail-rblchk</tt> only appends blocked IP to the file, filter it with
+  <tt>uniq</tt> before use. You can build your <tt>data</tt> file for
+  <a href="http://cr.yp.to/djbdns/rbldns.html">rbldns</a> with the script <tt>contrib/rbllist.sh</tt>.
+  <p>
+  With the utility <tt>getsenderip</tt> you can take the sender IP and append it to
+  a text file, the syntax is:
+<pre>
+    getsenderip [-s num] out
+</pre>
+  where <tt>out</tt> is the file where IPs are stored, with the <tt>-s</tt> option
+  you can skip first <tt>num</tt> IPs in the header of the mail.
+  The script <tt>contrib/dot-qmail-storeip</tt> is an example of use into your
+  <tt>.qmail</tt> file: you can use into a <tt>.qmail-spam</tt> to add other IPs to
+  your private spammer list, and a <tt>.qmail-friends</tt> for the good IPs (use
+  a different output file for the two system!!).<br>
+  <b>NOTE:</b> The example script skip first IP, usually is your IP and is not usefull
+  to add it to the lists! The <tt>EXT2</tt> variable was used to allow a more extensible
+  usage, if you use the example into a <tt>.qmail-spam-default</tt>, you can
+  send spam mails to <tt>spam-3@yourdom.tld</tt> and the script skip first 3 IPs.
+ <h2>Thanks</h2>
+  <ul>
+   <li>Joerg Backschues <tt>&lt;jbks AT tca-os DOT de&gt;</tt> for the English page check and testing on 300.000 users and 500.000 mails system! (<a href="qmail-rblchk.txt">results</a>);
+   <li>Brian T Glenn <tt>&lt;glenn AT delink DOT net&gt;</tt> for some option suggestions and for the disk space at USA mirror;
+   <li>Emanuel Haupt <tt>&lt;haupt AT critical DOT ch&gt;</tt> for the FreeBSD port and manpage hints;
+   <li>Emanuel's wife for the manpage correction;
+   <li>Everybody download, check, debug and use the package!
+  </ul>
+ </body>
+</html>

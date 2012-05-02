@@ -1,0 +1,14 @@
+See more info at:
+http://www.morettoni.net/qmail-rblchk.en.html
+
+* check global configuration files: conf-*
+
+* build and install the program with:
+  # make setup check
+
+* see options with:
+  # qmail-rblchk -h
+  # getsenderip
+
+-- 
+Luca Morettoni <luca@morettoni.net> - http://morettoni.net

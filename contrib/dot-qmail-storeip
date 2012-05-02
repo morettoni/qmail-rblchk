@@ -1,0 +1,1 @@
+| getsenderip -s $((${EXT2:-0}+1)) spamip.lst

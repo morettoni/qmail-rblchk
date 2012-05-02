@@ -1,0 +1,245 @@
+.TH QMAIL-RBLCHK 1
+.SH NAME
+qmail-rblchk \- filter all incoming mail and check if it comes from RBL listed IPs.
+.SH SYNOPSIS
+.B | qmail-rblchk
+[
+.I options
+] [
+.I /SpamDir/
+]
+.SH DESCRIPTION
+.I qmail-rblchk
+is used in .qmail files to check the IP address from the
+.B Received: from
+lines. It has the same function as
+.BR rblsmtpd(1)
+, but the messages are checked at local delivery time. With this you can check the content of the message by simply redirecting it to another mailbox or address.
+.br
+If a directory is given with
+.B /SpamDir/
+parameter, all spam message are delivered to that directory if it exist and is in Maildir format.
+The directory name must start with a / or . (dot) and end with a /.
+.SH OPTIONS
+.B General options:
+.TP
+.B \-h
+show help screen
+.TP
+.B \-s
+add
+.B X-Spam
+header to the incoming mail (work only with delivery to ``/SpamDir/'')
+.TP
+.B \-c
+turn on
+.BR condredirect(1)
+compatibility mode
+.TP
+.B \-i \fINUM
+ignore first 
+.I NUM
+IP addresses found in the header
+.TP
+.B \-x \fIIP
+do not check 
+.I IP
+, try to find other address in header
+.TP
+.B \-v
+verbose (debug) mode
+.TP
+.B \-V
+show program version
+.TP
+.B \-p
+don't check private IP class:
+ 127.0.0.0   - 127.255.255.255
+ 10.0.0.0    - 10.255.255.255
+ 172.16.0.0  - 172.31.255.255
+ 192.168.0.0 - 192.168.255.255
+.TP
+.B \-q
+quiet mode (suppress any output)
+.TP
+.B \-m
+check all IP in the email (default: check only first IP address)
+.TP
+.B \-l \fIlog
+write program action to
+.I log
+file
+.TP
+.B \-L \fIdata
+write blocked IP to
+.I data
+file
+.P
+.B Control options:
+.TP
+.B \-r \fIaddr
+use
+.I addr
+for RBL checking (block mail if
+.B TXT
+record exists)
+.TP
+.B \-R \fIaddr
+use
+.I addr
+for RBL reverted checking (block mail if
+.B TXT
+record does NOT exist)
+.TP
+.B \-a \fIaddr
+use
+.I addr
+for anti-RBL checking (block mail if
+.B A
+record does NOT exist)
+.TP
+.B \-A \fIaddr
+use
+.I addr
+for anti-RBL reverted checking (block mail if
+.B A
+record exist)
+.TP
+.B \-C \fIaddr
+use
+.I addr
+for one time RBL checking (don't block mail if
+.B A
+or
+.B TXT
+record exist)
+.TP
+.B \-X \fIcdb
+check if IP is listed in 
+.I cdb
+file, see 
+.B tcprules(1)
+or
+. B EXAMPLES
+section for the format
+.P
+You must specify one or more (max 32) RBL address or a
+.I CDB
+file, example:
+.nf
+  -r dnsbl.sorbs.net -r sbl-xbl.spamhaus.org -r relays.ordb.org
+  -X rule.cdb -r relays.ordb.org
+.TP
+You can ignore (-x option) no more than 16 IP address.
+.SH EXIT CODES
+The program exit status in
+.I normal
+mode:
+ 0    when the message is not blocked
+ 100  when the message is blocked
+ 111  when the program fails or no options were given
+
+In
+.I delivery
+mode:
+ 0    the message is not blocked (continue .qmail checking)
+ 99   the blocked message has been written to ``SpamDir'' Maildir
+ 111  when the program fails or no options were given
+
+In
+.I condredirect compatibility
+mode:
+ 0    when the message is blocked
+ 1    when the message is not blocked
+ 111  when the program fails or no options were given
+.SH EXAMPLES
+There are some examples of
+.B qmail-rblchk
+use, please use them carefully to prevent loss of mail.
+.P
+We check
+.I bl.spamcop.net
+and
+.I dialups.mail-abuse.org
+RBL list. If the mail is spam, the delivery will fail, and the sender will receive a bounce message:
+.P
+    # we discard all suspected mail
+    | qmail-rblchk -r dnsbl.sorbs.net -r sbl-xbl.spamhaus.org
+.P
+We delivery all mail that comes from RBL listed IP addresses to our
+.I ../spam/
+Maildir:
+.P
+    # save spam-suspected mail in another Maildir
+    | qmail-rblchk -r dnsbl.sorbs.net -r sbl-xbl.spamhaus.org ../spam/
+.P
+Same as above, but all spam messages are delivered to
+.I me-spam
+address with 
+.B condredirect
+:
+.P
+    # save spam-suspected mail in another box
+    | condredirect me-spam qmail-rblchk -c -r dnsbl.sorbs.net \\
+      -r sbl-xbl.spamhaus.org
+.P
+If you prefere to use a 
+.I CDB
+file, crete a
+.I rule
+file like that:
+.P
+    # allow mails from local network
+    192.168.0.:allow
+    # some spammer IPs
+    10.0.0.1:deny
+    1.2.3.4:deny
+.P
+create the
+.I CDB
+file with:
+.P
+    tcprules rule.cdb rule.tmp < rule
+.P
+The
+.I .qmail
+file is:
+.P
+    # save spam-suspected mail in another Maildir
+    | qmail-rblchk -X ./rule.cdb -r sbl-xbl.spamhaus.org ../spam/
+.P
+if the IP is found in
+.I rule.cdb qmail-rblchk
+follow the rule in the file:
+.P
+.I  allow
+the message is good
+.P
+.I  deny
+the message is spam
+.P
+if the IP is not listed
+.B qmail-rblchk
+continue with normal RBL checking. You can insert into the
+.I CDB
+file a default rule (:allow or :deny), to block or accept
+all other IPs.
+.SH AUTHOR
+Luca Morettoni <luca@morettoni.net> - http://morettoni.net
+.SH THANKS
+Joerg Backschues <jbks@tca-os.de> for the English page check and testing on 300.000 users and 500.000 mails system;
+.P
+Brian T Glenn <glenn@delink.net> for some option suggestions and for the disk space at USA mirror;
+.P
+Emanuel Haupt <haupt@critical.ch> for the FreeBSD port and manpage hints;
+.P
+Emanuel's wife for the manpage correction.
+.SH SEE ALSO
+dot-qmail(5),
+qmail-command(8),
+condredirect(1),
+tcprules(1)
+
+http://morettoni.net/qmail-rblchk.en.html
+.SH BUGS
+Report me any bug, problem or other hints!

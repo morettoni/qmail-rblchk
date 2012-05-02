@@ -1,0 +1,4 @@
+/var/qmail
+
+This is the qmail-rblchk home directory. Programs will be installed in
+.../bin.

@@ -1,0 +1,27 @@
+Date: Sun, 21 Sep 2003 13:09:14 +0200
+From: Joerg Backschues <jbks AT tca-os DOT de>
+To: Luca Morettoni <luca AT morettoni DOT net>
+Subject: Re: qmail-rblchk
+
+I´ve made the follwing test with 300000 users and 500000 mails (60% SPAM mails, 
+40% standard mails) on a Sun Enterprise 6500 System with 4x450 Mhz CPUs and 4 GB 
+RAM on a Midrange SAN Storage Device:
+
+Every user gets the following configuration:
+
+.qmail:
+|condredirect <user>-spam qmail-rblchk -c -n 127.0.0.1 -s rbl.local.test
+
+.qmail-spam:
+/home/<user>/Maildir/.UCE/
+
+So every mail from RBL listed IPs will be moved into the SPAM folder.
+
+qmail-rblchk works fine with all test mails. There was no problem. So i would 
+say, that qmail-rblchk could be used in production enviroments without risk.
+
+
+Greetings
+Jörg Backschues
+
+
